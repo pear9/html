@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Predictor</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+	<input id="Image-selector" type="file" >
+	<button id="predict-button">Go</button>
+	<p style="font-family: Arial">Predictions</p>
+	<p>Letter:<span id="letter"></span></p>
+	<p>Accuracy:<span id="acc"></span></p>
+	<img id="selected_image" src=""/>
+
+	<script type="text/javascript">
+		let base64Image;
+		$("#Image-selector").change(function(){
+			let reader = new FileReader();
+			reader.onload = function(e){
+				let dataURL = reader.result;
+				$('#selected_image').attr("src",dataURL);
+				base64Image=dataURL;
+				console.log(base64Image);
+			}
+			reader.readAsDataURL($('#Image-selector')[0].files[0]);
+			$('#letter').text("");
+			$('#acc').text("");
+		});
+
+		$("#predict-button").click(function(event){
+			let message = {
+				image:base64Image
+			}
+			console.log(message);
+			$.post("http://192.168.1.38:4000/predict",JSON.stringify(message),function(response){
+				$("#letter").text(response.prediction.result);
+				$("#acc").text(response.prediction.accuracy);
+				console.log(response);
+			});
+		});
+	</script>
+</body>
+</html>
